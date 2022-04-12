@@ -25,5 +25,6 @@ public class DBtestApplication implements CommandLineRunner {
         userDAO.update(new User("septon", "septik12@yandex.ru"), 3L);
         userDAO.delete(2L);
         System.out.println(userDAO.getAll());
+        System.out.println();
     }
 }
