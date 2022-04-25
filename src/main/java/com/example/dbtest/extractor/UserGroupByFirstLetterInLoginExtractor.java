@@ -6,22 +6,25 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
-public class UserGroupByFirstLetterInLoginExtractor implements ResultSetExtractor<List<User>> {
+public class UserGroupByFirstLetterInLoginExtractor implements ResultSetExtractor<Map<Character, List<User>>> {
     @Override
-    public List<User> extractData(ResultSet rs) throws SQLException, DataAccessException {
-        List<User> users = new ArrayList<>();
+    public Map<Character, List<User>> extractData(ResultSet rs) throws SQLException, DataAccessException {
+        HashMap<Character, List<User>> data = new HashMap<>();
         while (rs.next()) {
+            char letter = rs.getString("login").toLowerCase(Locale.ROOT).charAt(0);
+            List<User> users = data.get(letter);
+            if (users == null) {
+                users = new ArrayList<>();
+            }
             users.add(new User(
                     rs.getLong("id"),
                     rs.getString("login"),
-                    rs.getString("email"))
-            );
+                    rs.getString("email")
+            ));
+            data.put(letter, users);
         }
-        users.sort(Comparator.comparing(User::getLogin));
-        return users;
+        return data;
     }
 }

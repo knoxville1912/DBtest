@@ -1,7 +1,6 @@
 package com.example.dbtest.dao;
 
 import com.example.dbtest.dao.queries.UpdateUser;
-import com.example.dbtest.extractor.UserCountOfEmail;
 import com.example.dbtest.extractor.UserGroupByFirstLetterInLoginExtractor;
 import com.example.dbtest.extractor.UserGroupByMailExtractor;
 import com.example.dbtest.mapper.UserMapper;
@@ -87,17 +86,10 @@ public class UserDAO {
     /**
      * требуется сгруппировать пользователей по первой букве Logina
      */
-    public List<User> getUsersGroupByFirstLetterInLogin() {
+    public Map<Character, List<User>> getUsersGroupByFirstLetterInLogin() {
         return template.query(
                 "SELECT * FROM Users",
                 new UserGroupByFirstLetterInLoginExtractor()
-        );
-    }
-
-    public List<User> getUsersGroupByFirstLetterInLoginWithSQL() {
-        return template.query(
-                "SELECT * FROM Users ORDER BY login",
-                new UserMapper()
         );
     }
 
@@ -105,27 +97,16 @@ public class UserDAO {
      *Количество всех email
      */
     public Long getCountOfEmail() {
-        return template.query(
-                "SELECT * FROM Users",
-                new UserCountOfEmail()
+        return template.queryForObject(
+                "SELECT count(DISTINCT email) FROM Users",
+                new MapSqlParameterSource(),
+                Long.class
         );
     }
 
     /**
      *Получение списка юзеров по частичному поиску
      */
-    public List<User> findAllUserByLine(String line) {
-        List<User> users = getAll();
-        List<User> sorted = new ArrayList<>();
-
-        for (User user : users) {
-            if (user.getLogin().contains(line) || user.getEmail().contains(line)) {
-                sorted.add(user);
-            }
-        }
-        return sorted;
-    }
-
     public List<User> getAllUserByLineBySQL(String line) {
         return template.query(
                 "SELECT * FROM Users WHERE login LIKE concat('%', :line, '%') OR email LIKE concat('%', :line, '%')",
@@ -161,7 +142,7 @@ public class UserDAO {
      *
      * найдем количество всех email через SQL -
      *
-     * получение списка юзеров по частичному поиску(на вход строка, как логин так и почта, но может быть не полная)
+     * получение списка юзеров по частичному поиску(на вход строка, как логин так и почта, но может быть не полная) +
      */
 
 
