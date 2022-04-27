@@ -43,7 +43,7 @@
         <dependency>
             <groupId>ru.util</groupId>
             <artifactId>FileWorker</artifactId>
-            <version>1.2.0</version>
+            <version>1.2.2</version>
         </dependency>
     </dependencies>
 
